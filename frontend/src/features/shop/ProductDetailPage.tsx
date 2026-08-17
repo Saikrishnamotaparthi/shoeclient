@@ -166,7 +166,7 @@ const ProductDetailPage: React.FC = () => {
                 -{discountPct}%
               </span>
             )}
-            {(product.productStatus === 'COMING_SOON' || product.productStatus === 'SOLD_OUT' || product.productStatus === 'INACTIVE' || (!product.isActive && !product.productStatus)) && (
+            {(product.productStatus === 'COMING_SOON' || product.productStatus === 'SOLD_OUT' || product.productStatus === 'INACTIVE' || product.productStatus === 'RESTOCKING_SOON' || (!product.isActive && !product.productStatus)) && (
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                 <span className="text-white font-semibold text-lg">
                   {product.productStatus === 'COMING_SOON' ? 'Coming Soon' :

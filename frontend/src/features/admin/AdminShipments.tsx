@@ -202,7 +202,7 @@ export const AdminShipments = () => {
         responseType: 'blob',
       });
       // Check if response is JSON (label data) or PDF
-      const contentType = res.headers?.['content-type'] || '';
+      const contentType = String(res.headers?.['content-type'] || '');
       if (contentType.includes('application/json') || (res.data instanceof Blob && res.data.type === 'application/json')) {
         // Label data returned as JSON — open tracking URL instead
         if (shipment.trackingUrl) {

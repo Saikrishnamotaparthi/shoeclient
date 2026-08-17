@@ -103,7 +103,7 @@ export const AdminOrders = () => {
     setPrintingLabel(orderId);
     try {
       const res = await api.get(`/admin/orders/${orderId}/shipment/label`, { responseType: 'blob' });
-      const contentType = res.headers?.['content-type'] || '';
+      const contentType = String(res.headers?.['content-type'] || '');
       if (contentType.includes('application/json')) {
         const order = orders.find(o => o.id === orderId);
         if (order?.shipping?.trackingUrl) window.open(order.shipping.trackingUrl, '_blank');
