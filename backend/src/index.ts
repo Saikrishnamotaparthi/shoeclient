@@ -36,7 +36,12 @@ app.use(helmet({
     },
   },
 }));
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+// Normalize FRONTEND_URL — strip trailing slashes to avoid CORS mismatch
+const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/+$/, '');
+app.use(cors({
+  origin: frontendUrl,
+  credentials: true,
+}));
 
 // Webhooks must be parsed as raw before global json middleware
 app.use('/api/webhooks', webhooksRoutes);
