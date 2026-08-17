@@ -24,12 +24,17 @@ export const getOrders = async (req: AuthenticatedRequest, res: Response) => {
     const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
     const status = req.query.status as string;
 
+    // Use simple query without orderBy to avoid composite index requirement
+    // Sort in memory instead
     let query: Query = adminDb.collection('orders');
     if (targetUserId) query = query.where('customerId', '==', targetUserId);
     if (status) query = query.where('status', '==', status);
 
-    const snapshot = await query.orderBy('createdAt', 'desc').limit(limit).get();
+    const snapshot = await query.limit(limit).get();
     const orders = snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() }));
+
+    // Sort by createdAt in memory (descending)
+    orders.sort((a: any, b: any) => (b.createdAt || '').localeCompare(a.createdAt || ''));
 
     res.json({ orders, total: orders.length });
   } catch (error) {
