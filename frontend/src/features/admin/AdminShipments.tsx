@@ -11,9 +11,10 @@ interface Shipment {
   orderId: string;
   orderNumber: string;
   customerName: string;
-  provider: 'SHIPROCKET' | 'DELHIVERY' | string;
+  provider: 'SHIPROCKET' | 'DELHIVERY' | 'SHADOWFAX' | string;
   awb: string | null;
   courierName: string | null;
+  trackingUrl?: string | null;
   status: 'PENDING' | 'SHIPPED' | 'IN_TRANSIT' | 'DELIVERED' | 'FAILED' | 'CANCELLED' | string;
   createdAt: string;
   expectedDelivery: string | null;
