@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users: Can read/write their own profile. Admin can do anything.
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+      
+      // Wishlist subcollection
+      match /wishlist/{productId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+      
+      // Notifications subcollection
+      match /notifications/{notificationId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Products: Anyone can read. Only Admin or Backend can write.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Orders: Users can read their own orders. Only Admin or Backend can write.
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && resource.data.customerId == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+
+    // Payments: Strictly internal/admin only.
+    match /payments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Coupons: Users can't read all coupons, validation happens via backend.
+    match /coupons/{couponId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Audit Logs: Admin only
+    match /auditLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Notification Events (Idempotency): Admin/Backend only
+    match /notificationEvents/{eventId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Settings: Admin only
+    match /settings/{settingId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // Returns: Users can read their own returns. Admin can read/write.
+    match /returns/{returnId} {
+      allow read: if isAuthenticated() && resource.data.customerId == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+
+    // Refunds: Users can read their own refunds. Admin can read/write.
+    match /refunds/{refundId} {
+      allow read: if isAuthenticated() && resource.data.customerId == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+    
+    // Reviews: Anyone can read approved reviews (managed by backend anyway). 
+    // Customers read their own pending reviews. Admins can do anything.
+    match /reviews/{reviewId} {
+      allow read: if resource.data.status == 'APPROVED' || (isAuthenticated() && resource.data.customerId == request.auth.uid) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Review Reports: Users can read their own reports. Admin can read/write.
+    match /reviewReports/{reportId} {
+      allow read: if isAuthenticated() && resource.data.reporterId == request.auth.uid;
+      allow read, write: if isAdmin();
+    }
+    // Default deny for anything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

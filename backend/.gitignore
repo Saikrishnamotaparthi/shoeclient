@@ -1,0 +1,25 @@
+# ─── Backend .gitignore ───────────────────────────────────────────────────────
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+
+# Temporary
+tmp/
